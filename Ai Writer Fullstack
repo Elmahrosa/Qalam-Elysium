@@ -1,0 +1,48 @@
+// Struktur Project: // - backend/ //    - routes/ai.routes.js //    - app.js //    - .env // - frontend/ //    - src/components/AIEditor.jsx //    - src/App.jsx //    - src/index.js
+
+//--------------------------------------------- // === BACKEND === //---------------------------------------------
+
+// backend/routes/ai.routes.js const express = require("express"); const router = express.Router(); const { Configuration, OpenAIApi } = require("openai");
+
+const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY }); const openai = new OpenAIApi(configuration);
+
+async function askAI({ prompt, mode = "generate", maxTokens = 500, temperature = 0.7 }) { const systemPrompt = { generate: "You are a helpful assistant that writes knowledge articles clearly.", summarize: "You are a summarizer that condenses content clearly.", rewrite: "You are a writing assistant that improves and rewrites text in better form.", }; const response = await openai.createChatCompletion({ model: "gpt-4", messages: [ { role: "system", content: systemPrompt[mode] || systemPrompt.generate }, { role: "user", content: prompt } ], temperature, max_tokens: maxTokens, }); return response.data.choices[0].message.content.trim(); }
+
+router.post("/generate", async (req, res) => { try { const { prompt, mode, temperature, maxTokens } = req.body; if (!prompt) return res.status(400).json({ error: "Prompt wajib diisi." }); const result = await askAI({ prompt, mode, temperature, maxTokens }); res.json({ result }); } catch (error) { console.error("AI Error:", error.response?.data || error.message); res.status(500).json({ error: "Gagal memproses permintaan AI." }); } });
+
+module.exports = router;
+
+// backend/app.js require("dotenv").config(); const express = require("express"); const aiRoutes = require("./routes/ai.routes"); const cors = require("cors");
+
+const app = express(); app.use(cors()); app.use(express.json()); app.use("/api/ai", aiRoutes);
+
+const PORT = process.env.PORT || 3000; app.listen(PORT, () => console.log(Server jalan di http://localhost:${PORT}));
+
+// backend/.env PORT=3000 OPENAI_API_KEY=your_openai_key_here
+
+//--------------------------------------------- // === FRONTEND === //---------------------------------------------
+
+// frontend/src/components/AIEditor.jsx import React, { useState } from "react"; import axios from "axios";
+
+const AIEditor = () => { const [text, setText] = useState(""); const [mode, setMode] = useState("generate"); const [loading, setLoading] = useState(false);
+
+const handleAI = async () => { if (!text) return; setLoading(true); try { const res = await axios.post("http://localhost:3000/api/ai/generate", { prompt: text, mode }); setText(res.data.result); } catch (err) { alert("Gagal mendapatkan respon dari AI"); } finally { setLoading(false); } };
+
+return ( <div className="p-4 space-y-4"> <h2 className="text-xl font-bold">AI Penulis Cerdas</h2> <select className="border px-2 py-1" value={mode} onChange={(e) => setMode(e.target.value)} > <option value="generate">Generate Baru</option> <option value="summarize">Ringkasan</option> <option value="rewrite">Parafrase</option> </select> <textarea className="w-full h-60 border p-2" value={text} onChange={(e) => setText(e.target.value)} placeholder="Tulis teks atau prompt di sini..." /> <button
+onClick={handleAI}
+className="bg-blue-600 text-white px-4 py-2 rounded"
+disabled={loading}
+> {loading ? "Memproses..." : "Bantu AI"} </button> </div> ); };
+
+export default AIEditor;
+
+// frontend/src/App.jsx import React from "react"; import AIEditor from "./components/AIEditor";
+
+const App = () => { return ( <div className="max-w-3xl mx-auto py-10"> <AIEditor /> </div> ); };
+
+export default App;
+
+// frontend/src/index.js import React from "react"; import ReactDOM from "react-dom/client"; import App from "./App"; import "./index.css";
+
+const root = ReactDOM.createRoot(document.getElementById("root")); root.render( <React.StrictMode> <App /> </React.StrictMode> );
+
