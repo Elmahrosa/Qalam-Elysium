@@ -1,0 +1,48 @@
+{
+  "name": "qalam-elysium",
+  "version": "1.0.0",
+  "description": "A powerful and feature-rich application for managing and sharing knowledge.",
+  "main": "src/main/app.js",
+  "scripts": {
+    "start": "node src/main/app.js",
+    "dev": "nodemon src/main/app.js",
+    "test": "jest",
+    "build": "echo 'No build step defined'",
+    "lint": "eslint .",
+    "setup": "bash ./scripts/setup.sh",
+    "deploy": "bash ./deploy.sh"
+  },
+  "keywords": [
+    "knowledge",
+    "management",
+    "sharing",
+    "application"
+  ],
+  "author": "KOSASIH",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.10.9",
+    "jsonwebtoken": "^8.5.1",
+    "dotenv": "^10.0.0",
+    "cors": "^2.8.5",
+    "body-parser": "^1.19.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "supertest": "^6.1.0",
+    "nodemon": "^2.0.7",
+    "eslint": "^7.14.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Elmahrosa/qalam-elysium.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Elmahrosa/qalam-elysium/issues"
+  },
+  "homepage": "https://github.com/Elmahrosa/qalam-elysium#readme"
+}
