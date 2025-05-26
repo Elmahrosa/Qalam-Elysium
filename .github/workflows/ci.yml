@@ -1,0 +1,70 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Specify the Node.js version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linting
+        run: npm run lint  # Ensure you have a lint script in your package.json
+
+      - name: Run tests
+        run: npm test  # Run your test suite
+
+      - name: Build the application
+        run: npm run build  # Build your application
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Ensure the build job completes successfully before deploying
+    if: github.ref == 'refs/heads/main'  # Only deploy from the main branch
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install --production  # Install only production dependencies
+
+      - name: Deploy to Production
+        env:
+          NODE_ENV: production
+          API_KEY: ${{ secrets.API_KEY }}  # Use GitHub Secrets for sensitive data
+        run: |
+          echo "Deploying to production server..."
+          # Add your deployment commands here, e.g., using SSH or a cloud provider CLI
+          # Example: ssh user@your-server "cd /path/to/app && git pull && npm install --production && pm2 restart app"
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build, deploy]  # Notify after build and deploy jobs
+    steps:
+      - name: Send Notification
+        uses: some-notification-action@v1  # Replace with a real notification action
+        with:
+          message: "Deployment to production completed successfully!"
+          webhook_url: ${{ secrets.NOTIFICATION_WEBHOOK }}  # Use GitHub Secrets for sensitive data
