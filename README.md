@@ -109,6 +109,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 For any inquiries or feedback, please contact:
 
-- Ayman Seif
-- Email: your.email@example.com
-- GitHub: [yourusername](https://github.com/yourusername)
+- [Ayman Seif](https://www.linkedin.com/in/aymanseif)
